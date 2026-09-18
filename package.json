@@ -1,0 +1,21 @@
+{
+  "name": "axone-telegram-community-zone",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Experimental Axone-governed Telegram community zone prototype",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test dist/test/*.test.js",
+    "ci": "npm run build && npm test",
+    "stake": "npm run build --silent && node --env-file=.env dist/src/cli.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2"
+  }
+}
