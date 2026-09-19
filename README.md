@@ -24,9 +24,31 @@ The project turns a simple community rule into a governed act:
 
 ## Current milestone
 
-Milestone 1 reads all active staking delegations for one Axone address and
-applies a configurable threshold. It is deliberately read-only: no wallet
-signature, Telegram bot, transaction, or on-chain Zone deployment exists yet.
+Milestone 1 — active staking qualification — is complete.
+
+The prototype can now:
+
+- query all active staking delegations for an Axone address;
+- follow Cosmos SDK pagination;
+- aggregate delegations across multiple validators;
+- apply a configurable threshold;
+- return `eligible` or `read_only`.
+
+The implementation has been validated against live Axone networks:
+
+- Axone testnet (`axone-dendrite-2`);
+- Axone mainnet (`axone-1`).
+
+A mainnet validation with 11 active validator delegations was independently
+cross-checked against the Cosmos SDK REST response and produced the same
+aggregate staking amount.
+
+The project remains read-only. It does not yet prove wallet ownership, interact
+with Telegram, submit transactions, or execute the draft regime on-chain.
+
+The next milestone is **Milestone 2 — regime formalisation**: define the actors,
+acts, evidence, qualification rules, decisions and effects precisely, then
+validate how that regime should be expressed and executed through Axone.
 
 ## Quick start
 

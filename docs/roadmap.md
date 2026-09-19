@@ -8,7 +8,15 @@
 - [x] sum active `uaxone` delegation balances;
 - [x] return `eligible` or `read_only`;
 - [x] unit-test threshold and pagination behaviour;
-- [ ] validate against a real Axone address and trusted explorer/wallet.
+- [x] validate against live Axone networks and independently cross-check REST results.
+
+**Status: completed.**
+
+Validation was performed against both Axone testnet (`axone-dendrite-2`) and
+mainnet (`axone-1`). A mainnet account with 11 active delegations confirmed
+that the implementation correctly aggregates staking across multiple validators.
+The aggregate returned by the TypeScript implementation matched an independent
+sum of the Cosmos SDK REST response.
 
 ## Milestone 2 — Regime formalisation
 

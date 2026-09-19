@@ -10,6 +10,11 @@ This repository is intentionally developed in small, testable milestones. Each m
 
 Read all active delegations for an Axone address, aggregate them and apply a configurable threshold.
 
+**Status: completed and validated on live Axone networks.**
+
+The implementation has been checked against both testnet and mainnet REST
+endpoints, including a real mainnet account delegating to 11 validators.
+
 ### 2. Formalise the regime
 
 Define actors, acts, evidence, qualification, decisions and effects; then express the rule in Prolog and validate the appropriate Axone execution path.
@@ -31,6 +36,23 @@ Grant/revoke posting rights, implement renewal, grace-period handling and reconc
 Move regime ownership and qualification toward Axone. Keep the backend and Telegram bot as evidence and enforcement adapters.
 
 ## Local workflow
+
+## Network configuration
+
+Network endpoints are configured locally through environment files and must
+not be committed to the repository.
+
+For development, keep separate configurations when useful, for example:
+
+- `.env.testnet`
+- `.env.mainnet`
+
+Only `.env.example` is tracked by Git.
+
+Milestone 1 performs read-only REST queries. Mainnet was used only to validate
+staking reads against real multi-validator delegation data. Future development
+involving transactions or on-chain state changes must use a suitable test or
+local development environment before any mainnet interaction.
 
 ```bash
 npm install
