@@ -4,12 +4,20 @@ export interface AppConfig {
   pageLimit: number;
 }
 
-function requiredEnv(name: string): string {
-  const value = process.env[name]?.trim();
+export interface TelegramConfig {
+  botToken: string;
+}
+
+function requiredEnvFrom(env: NodeJS.ProcessEnv, name: string): string {
+  const value = env[name]?.trim();
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
   return value;
+}
+
+function requiredEnv(name: string): string {
+  return requiredEnvFrom(process.env, name);
 }
 
 function parsePositiveInteger(value: string, name: string): number {
@@ -45,8 +53,22 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
 
   return {
     restUrl: restUrl.toString().replace(/\/$/, ""),
-    minStakeUaxone: parseNonNegativeBigInt(minStake, "AXONE_MIN_STAKE_UAXONE"),
-    pageLimit: parsePositiveInteger(pageLimitRaw, "AXONE_STAKING_PAGE_LIMIT")
+    minStakeUaxone: parseNonNegativeBigInt(
+      minStake,
+      "AXONE_MIN_STAKE_UAXONE"
+    ),
+    pageLimit: parsePositiveInteger(
+      pageLimitRaw,
+      "AXONE_STAKING_PAGE_LIMIT"
+    )
+  };
+}
+
+export function loadTelegramConfig(
+  env: NodeJS.ProcessEnv = process.env
+): TelegramConfig {
+  return {
+    botToken: requiredEnvFrom(env, "TELEGRAM_BOT_TOKEN")
   };
 }
 
