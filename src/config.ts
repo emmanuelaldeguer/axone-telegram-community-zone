@@ -6,6 +6,7 @@ export interface AppConfig {
 
 export interface TelegramConfig {
   botToken: string;
+  sandboxChatId: string;
 }
 
 function requiredEnvFrom(env: NodeJS.ProcessEnv, name: string): string {
@@ -68,7 +69,8 @@ export function loadTelegramConfig(
   env: NodeJS.ProcessEnv = process.env
 ): TelegramConfig {
   return {
-    botToken: requiredEnvFrom(env, "TELEGRAM_BOT_TOKEN")
+    botToken: requiredEnvFrom(env, "TELEGRAM_BOT_TOKEN"),
+    sandboxChatId: requiredEnvFrom(env, "TELEGRAM_SANDBOX_CHAT_ID")
   };
 }
 
