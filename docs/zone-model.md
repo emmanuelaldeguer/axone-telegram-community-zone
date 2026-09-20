@@ -15,14 +15,34 @@ outside the Axone regime and under the authority of Telegram administrators.
 
 ## 1. Actor
 
-An actor is a Telegram user linked to an Axone account.
+The governed actor is a Telegram user requesting the right to contribute to the
+Axone Telegram community.
 
-The final system must establish two independent facts:
+The Community Zone must not identify this actor through an Axone wallet address
+and must not persist a direct Telegram-to-wallet mapping.
 
-1. the Telegram identity of the requester;
-2. control of the linked Axone account.
+The architecture distinguishes two privacy-separated roles:
 
-The Telegram-to-wallet association remains off-chain.
+### Telegram actor
+
+The Telegram user requesting or maintaining contributor access.
+
+The Telegram side may know the Telegram identity required to apply Telegram
+permissions.
+
+### Axone qualification subject
+
+An Axone wallet or account whose wallet control and staking state are evaluated
+under the Community Zone regime.
+
+The Axone-side qualification process may know the wallet address, but it must not
+require the Telegram identity.
+
+The relationship between the Telegram actor and the Axone qualification subject
+must not be directly exposed or persistently recorded.
+
+A privacy-preserving qualification proof or credential must bridge the two sides
+without revealing the underlying Axone wallet address to Telegram.
 
 ---
 
@@ -46,37 +66,112 @@ Periodic eligibility checks are treated as requalification of this same right ra
 
 ## 3. Evidence
 
-Qualification relies on explicit evidence.
+The Community Zone uses evidence while preserving a strict privacy boundary
+between Telegram identity and Axone wallet identity.
 
 ### 3.1 Telegram identity evidence
 
 `telegram_identity_verified`
 
-Demonstrates that the request is associated with the relevant Telegram user.
+Demonstrates that the current request originates from the relevant Telegram user.
 
-Not implemented yet.
+This evidence exists only on the Telegram side.
 
-### 3.2 Wallet control evidence
+It must not contain or reference an Axone wallet address.
+
+### 3.2 Qualification presentation evidence
+
+`qualification_proof_valid`
+
+Demonstrates that the Telegram actor presents a valid qualification under the
+Community Zone regime.
+
+The exact cryptographic mechanism is not yet selected.
+
+A future proof or credential must allow the Telegram side to verify information
+such as:
+
+```text
+regime = telegram-community-zone
+regime_version = ...
+qualification = eligible | grace_period
+valid_until = ...
+```
+
+without revealing:
+
+```text
+wallet = axone1...
+```
+
+The presentation mechanism must also provide suitable replay protection and
+should minimise correlation between credential issuance and presentation.
+
+### 3.3 Upstream wallet-control evidence
 
 `wallet_control_verified`
 
-Demonstrates that the Telegram user controls the linked Axone account.
+Demonstrates control of the Axone account used for qualification.
 
-The planned mechanism is a signed, time-limited nonce.
+This evidence belongs to the Axone-side qualification process.
+
+It must not contain a Telegram identifier and must not be transmitted to the
+Telegram bot.
+
+The planned mechanism is a signed, time-limited challenge.
 
 Not implemented yet.
 
-### 3.3 Active staking evidence
+### 3.4 Upstream active staking evidence
 
 `active_delegation_amount`
 
-Represents the total active delegation amount of the linked Axone account.
+Represents the total active delegation amount of the Axone qualification subject.
 
 Delegations across all validators are aggregated.
 
 Delegations currently unbonding are not counted.
 
 This evidence is already implemented and validated in Milestone 1.
+
+Raw staking evidence must remain on the Axone side and must not be exposed to
+Telegram.
+
+### 3.5 Evidence boundary
+
+The Telegram side consumes qualification evidence, not wallet evidence.
+
+Conceptually:
+
+```text
+AXONE SIDE
+
+wallet control
+AND
+active staking
+        |
+        v
+qualification
+        |
+        v
+privacy-preserving proof / credential
+
+
+TELEGRAM SIDE
+
+Telegram identity
+AND
+valid qualification presentation
+        |
+        v
+contributor access decision
+```
+
+No component should require a plaintext mapping:
+
+```text
+Telegram user <-> Axone wallet
+```
 
 ---
 
@@ -141,28 +236,67 @@ Effect: Telegram publishing rights are not granted or are removed.
 
 ## 6. Eligibility rule
 
-An actor is eligible when all of the following are true:
+Qualification occurs across two privacy-separated stages.
 
-1. Telegram identity is verified;
-2. control of the linked Axone account is verified;
-3. active staking is greater than or equal to the regime threshold.
+### 6.1 Axone-side qualification
+
+The Axone-side qualification process determines whether the underlying wallet
+satisfies the economic regime.
+
+Conceptually:
+
+```text
+wallet_control_verified
+AND
+active_stake >= minimum_active_stake
+→ eligible
+```
+
+Unbonding stake is excluded from the calculation.
+
+The resulting qualification must be transformed into a privacy-preserving proof
+or credential before it is presented to Telegram.
+
+### 6.2 Telegram-side access decision
+
+The Telegram side must not independently query the actor's wallet or staking
+position.
+
+Contributor access may be granted when:
+
+1. the Telegram identity for the current interaction is established;
+2. a valid Community Zone qualification proof is presented;
+3. the proof applies to the expected regime and regime version;
+4. the qualification has not expired;
+5. replay-protection requirements are satisfied;
+6. the proof establishes `eligible` or a currently valid `grace_period`.
 
 Conceptually:
 
 ```text
 telegram_identity_verified
-AND wallet_control_verified
-AND active_stake >= minimum_active_stake
-→ eligible
+AND
+qualification_proof_valid
+AND
+qualification_not_expired
+→ contributor access
 ```
 
-Unbonding stake is excluded from the calculation.
+The Telegram-side decision must not require disclosure of the underlying Axone
+wallet address.
 
 ---
 
 ## 7. Grace-period lifecycle
 
 Eligibility is continuously re-evaluated.
+
+Grace-period computation belongs to the Axone-side qualification process.
+
+The Telegram side should receive only a valid proof of the resulting
+qualification state and must not re-evaluate staking directly.
+
+Presentation of a proof must never reset `grace_started_at`.
 
 Example:
 
@@ -271,19 +405,72 @@ This separation is intentional.
 
 ## 11. Technical failure rule
 
-Failure to query Axone infrastructure is not evidence of ineligibility.
+Failure to query Axone infrastructure is not evidence that staking has fallen
+below the threshold.
+
+This rule is evaluated on the Axone side.
 
 If staking evidence cannot temporarily be refreshed:
 
 - the most recent valid qualification remains effective until its expiry;
-- the actor is not immediately downgraded;
+- the qualification validity period is not extended merely because Axone is unavailable;
 - verification should be retried.
 
-Technical failure and negative qualification must remain distinct.
+If fresh Axone evidence cannot be obtained before qualification expiry:
+
+```text
+qualification → read_only
+```
+
+When Axone becomes available again, fresh evidence may immediately produce a new
+qualification.
+
+If the staking requirement is satisfied again:
+
+```text
+read_only → eligible
+```
+
+The Telegram side does not need to know whether an expired qualification resulted
+from insufficient staking or infrastructure unavailability.
+
+It only needs to know whether a valid qualification proof currently exists.
+
+Technical failure and negative staking evidence remain distinct on the Axone side.
 
 ---
 
-## 12. Scope of Milestone 2
+## 12. Privacy invariant
+
+The Community Zone must preserve unlinkability between Telegram identity and
+Axone wallet identity.
+
+The following relationship must never become a required application data model:
+
+```text
+Telegram user <-> Axone wallet address
+```
+
+In particular:
+
+- Axone wallet addresses must never be sent through Telegram;
+- the Telegram bot must not query staking by wallet address;
+- Telegram-side state must not persist wallet addresses;
+- Axone-side qualification must not require Telegram identifiers;
+- application logs must not reconstruct the prohibited mapping;
+- qualification credentials must minimise correlation between issuance and presentation.
+
+Avoiding database storage alone is not sufficient.
+
+The architecture must also avoid creating a trivially reconstructable link through
+credentials, logs, request metadata or shared backend state.
+
+The exact privacy-preserving credential mechanism remains to be selected during
+Milestone 4.
+
+---
+
+## 13. Scope of Milestone 2
 
 Milestone 2 must:
 
@@ -299,4 +486,6 @@ Milestone 2 does not yet include:
 - wallet signature verification;
 - Telegram Mini App development;
 - on-chain deployment;
-- production moderation mechanisms.
+- production moderation mechanisms;
+- privacy-preserving qualification credential design;
+- unlinkable credential issuance and presentation.

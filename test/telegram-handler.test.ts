@@ -49,6 +49,33 @@ test("responds to addressed /start command in sandbox group", () => {
   assert.ok(result);
 });
 
+test("starts privacy-preserving verification without wallet address", () => {
+  const result = handleTelegramUpdate(
+    update(-5445609275, "/verify"),
+    sandboxChatId
+  );
+
+  assert.ok(result);
+  assert.match(result.text, /Privacy-preserving verification/);
+  assert.match(result.text, /without exposing your Axone wallet address/);
+});
+
+test("rejects wallet address supplied through Telegram", () => {
+  const result = handleTelegramUpdate(
+    update(
+      -5445609275,
+      "/verify axone18e6a52ld4mvq9qurj2k3hc2am92al4jmep2e5j"
+    ),
+    sandboxChatId
+  );
+
+  assert.ok(result);
+  assert.match(
+    result.text,
+    /Do not send an Axone wallet address through Telegram/
+  );
+});
+
 test("ignores commands from another Telegram group", () => {
   const result = handleTelegramUpdate(
     update(-123456789, "/start"),

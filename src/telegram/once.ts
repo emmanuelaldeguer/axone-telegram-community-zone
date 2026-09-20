@@ -1,30 +1,41 @@
 import { loadTelegramConfig } from "../config.js";
+
 import {
   getTelegramUpdates,
   sendTelegramMessage
 } from "./api.js";
-import { handleTelegramUpdate } from "./handler.js";
+
+import {
+  handleTelegramUpdate
+} from "./handler.js";
 
 async function main(): Promise<void> {
-  const config = loadTelegramConfig();
+  const telegramConfig = loadTelegramConfig();
 
-  const updates = await getTelegramUpdates(config.botToken);
+  const updates = await getTelegramUpdates(
+    telegramConfig.botToken
+  );
 
   if (updates.length === 0) {
     console.log("No Telegram updates available.");
     return;
   }
 
-  console.log(`Received ${updates.length} Telegram update(s).`);
+  console.log(
+    `Received ${updates.length} Telegram update(s).`
+  );
 
   let highestUpdateId = -1;
 
   for (const update of updates) {
-    highestUpdateId = Math.max(highestUpdateId, update.update_id);
+    highestUpdateId = Math.max(
+      highestUpdateId,
+      update.update_id
+    );
 
     const reply = handleTelegramUpdate(
       update,
-      config.sandboxChatId
+      telegramConfig.sandboxChatId
     );
 
     if (!reply) {
@@ -32,7 +43,7 @@ async function main(): Promise<void> {
     }
 
     await sendTelegramMessage(
-      config.botToken,
+      telegramConfig.botToken,
       reply.chatId,
       reply.text
     );
@@ -42,11 +53,9 @@ async function main(): Promise<void> {
     );
   }
 
-  // Confirm that the updates processed above do not need to be returned again
-  // during the next one-shot execution.
   if (highestUpdateId >= 0) {
     await getTelegramUpdates(
-      config.botToken,
+      telegramConfig.botToken,
       highestUpdateId + 1
     );
   }

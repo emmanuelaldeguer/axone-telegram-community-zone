@@ -81,47 +81,58 @@ integration milestone.
 ## Milestone 3 — Telegram read-only integration
 
 The objective of this milestone is to connect the prototype to Telegram without
-yet changing user permissions.
+yet changing user permissions and without exposing Axone wallet addresses to
+Telegram.
 
-The bot must be able to observe and explain qualification, but not enforce it.
+The Telegram-side application must remain independent from wallet identity.
 
 - [ ] create a dedicated Telegram sandbox group;
 - [ ] create and configure a Telegram bot;
 - [ ] load Telegram credentials securely from environment configuration;
+- [ ] restrict the prototype to the configured sandbox group;
 - [ ] implement `/start`;
-- [ ] implement `/verify`;
-- [ ] implement `/status`;
-- [ ] associate a Telegram user with an Axone address provisionally;
-- [ ] query active Axone staking through the existing staking adapter;
-- [ ] evaluate qualification through the regime policy;
-- [ ] return the qualification and decision to the user;
-- [ ] persist minimal qualification state required for lifecycle testing;
+- [ ] define `/verify` as the entry point to a separate privacy-preserving qualification flow;
+- [ ] implement `/status` without requiring access to an Axone wallet address;
+- [ ] ensure no Axone wallet address is sent through Telegram;
+- [ ] ensure no Telegram-to-wallet mapping is persisted;
 - [ ] keep all Telegram permission mutation disabled;
 - [ ] add automated tests for the Telegram adapter boundary;
-- [ ] document the end-to-end read-only verification flow.
+- [ ] document the read-only Telegram flow and privacy boundary.
 
-**Status: not started.**
+**Status: in progress.**
 
-At this stage, wallet ownership is not yet cryptographically proven.
+During Milestone 3, Telegram must never receive the user's Axone wallet address.
 
-The Telegram-to-Axone-address association is therefore provisional and suitable
-only for sandbox testing.
+`/verify` must not accept an `axone1...` address as a Telegram command argument.
+
+The qualification flow will be designed so that the Telegram side eventually
+receives only a privacy-preserving proof or credential establishing that the
+Community Zone requirements are satisfied.
 
 No user must receive or lose Telegram publishing rights during Milestone 3.
 
 ---
 
-## Milestone 4 — Wallet control
+## Milestone 4 — Privacy-preserving wallet qualification
 
-- [ ] Telegram Mini App authentication;
-- [ ] nonce issuance;
-- [ ] nonce expiry;
-- [ ] replay protection;
-- [ ] Keplr/Axone signing flow;
-- [ ] signature verification;
-- [ ] secure Telegram-to-wallet binding;
-- [ ] integrate `wallet_control_verified` evidence into qualification;
-- [ ] document privacy and security assumptions.
+The objective of this milestone is to prove wallet control and staking
+qualification without creating a durable Telegram-to-wallet link.
+
+- [ ] define the privacy-preserving qualification architecture;
+- [ ] define separation between Telegram-side and Axone-side components;
+- [ ] implement wallet-control challenge issuance;
+- [ ] implement nonce expiry;
+- [ ] implement replay protection;
+- [ ] implement Keplr/Axone signing flow;
+- [ ] verify wallet control without using a Telegram identifier;
+- [ ] evaluate active staking against the applicable regime;
+- [ ] define a minimal qualification credential or proof;
+- [ ] ensure the credential does not disclose the Axone wallet address;
+- [ ] ensure the credential does not disclose a Telegram identifier;
+- [ ] minimise correlation between credential issuance and presentation;
+- [ ] evaluate blind credentials, anonymous credentials and/or zero-knowledge approaches;
+- [ ] define regime identifier and version binding;
+- [ ] document the resulting privacy and threat model.
 
 ---
 
