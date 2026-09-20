@@ -37,6 +37,13 @@ Move regime ownership and qualification toward Axone. Keep the backend and Teleg
 
 ## Local workflow
 
+```bash
+npm install
+cp .env.example .env
+npm run ci
+npm run stake -- axone1...
+```
+
 ## Network configuration
 
 Network endpoints are configured locally through environment files and must
@@ -53,10 +60,3 @@ Milestone 1 performs read-only REST queries. Mainnet was used only to validate
 staking reads against real multi-validator delegation data. Future development
 involving transactions or on-chain state changes must use a suitable test or
 local development environment before any mainnet interaction.
-
-```bash
-npm install
-cp .env.example .env
-npm run ci
-npm run stake -- axone1...
-```
