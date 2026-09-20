@@ -36,8 +36,9 @@ The prototype can now:
 
 The implementation has been validated against live Axone networks:
 
-- Axone testnet (`axone-dendrite-2`);
-- Axone mainnet (`axone-1`).
+Canonical network endpoints used by the project are documented in
+[`docs/development-guide.md`](docs/development-guide.md) and follow the network
+definitions published in `axone-protocol/contracts`.
 
 A mainnet validation with 11 active validator delegations was independently
 cross-checked against the Cosmos SDK REST response and produced the same

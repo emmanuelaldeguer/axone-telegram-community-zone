@@ -60,3 +60,31 @@ Milestone 1 performs read-only REST queries. Mainnet was used only to validate
 staking reads against real multi-validator delegation data. Future development
 involving transactions or on-chain state changes must use a suitable test or
 local development environment before any mainnet interaction.
+
+### Canonical Axone network endpoints
+
+Network definitions should follow the canonical configuration published in the
+`axone-protocol/contracts` repository.
+
+Current testnet configuration:
+
+| Property | Value |
+| --- | --- |
+| Network | Axone testnet |
+| Chain ID | `axone-dendrite-2` |
+| REST / LCD | `https://api.axone.aknodes.net` |
+| gRPC | `http://grpc.axone.aknodes.net:9290` |
+| Address prefix | `axone` |
+| Gas denomination | `uaxone` |
+
+The current staking prototype uses the REST / LCD endpoint.
+
+The gRPC endpoint is documented for future Axone integrations but is not used by
+the Milestone 1 staking adapter.
+
+Source of truth:
+
+[`axone-protocol/contracts/packages/axone-networks/src/lib.rs`](https://github.com/axone-protocol/contracts/blob/main/packages/axone-networks/src/lib.rs)
+
+Local network endpoints belong in environment files such as `.env.testnet`.
+Those files must not be committed.
