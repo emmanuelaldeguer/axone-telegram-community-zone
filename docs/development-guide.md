@@ -8,7 +8,9 @@ This repository is intentionally developed in small, testable milestones. Each m
 
 ### 1. Read and qualify staking
 
-Read all active delegations for an Axone address, aggregate them and apply a configurable threshold.
+Read delegations for an Axone address, retain only those targeting validators
+currently in `BOND_STATUS_BONDED`, aggregate their `uaxone` balances and apply
+a configurable threshold.
 
 **Status: completed and validated on live Axone networks.**
 

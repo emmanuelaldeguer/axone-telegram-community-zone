@@ -25,7 +25,7 @@ The regime evaluates the following inputs:
 | --- | --- |
 | `telegram_verified` | Telegram identity has been authenticated |
 | `wallet_control_verified` | Control of the linked Axone account has been proven |
-| `active_stake` | Total active delegation amount |
+| `active_stake` | Total `uaxone` delegated to validators currently in `BOND_STATUS_BONDED` |
 | `minimum_stake` | Minimum amount required by the regime |
 | `previous_qualification` | Most recent valid qualification |
 | `grace_started_at` | Time at which the grace period began |

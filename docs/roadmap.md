@@ -15,8 +15,10 @@
 Validation was performed against both Axone testnet (`axone-dendrite-2`) and
 mainnet (`axone-1`).
 
-A mainnet account with 11 active delegations confirmed that the implementation
-correctly aggregates staking across multiple validators.
+A mainnet account with multiple validator delegations confirmed that the
+implementation correctly aggregates staking across validators. The adapter was
+later refined to count only delegations to validators currently in
+`BOND_STATUS_BONDED`.
 
 The aggregate returned by the TypeScript implementation matched an independent
 sum of the Cosmos SDK REST response.

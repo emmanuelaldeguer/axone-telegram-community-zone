@@ -16,7 +16,7 @@ The project turns a simple community rule into a governed act:
 | --- | --- |
 | Actor | Telegram user linked to an Axone wallet |
 | Act | Request the right to publish |
-| Evidence | Wallet control and active delegation amount |
+| Evidence | Wallet control and stake delegated to BONDED validators |
 | Regime | Public, versioned eligibility rules |
 | Qualification | `eligible`, later `grace_period`, or `read_only` |
 | Decision | Grant, maintain, or remove publishing access |
@@ -40,9 +40,9 @@ Canonical network endpoints used by the project are documented in
 [`docs/development-guide.md`](docs/development-guide.md) and follow the network
 definitions published in `axone-protocol/contracts`.
 
-A mainnet validation with 11 active validator delegations was independently
-cross-checked against the Cosmos SDK REST response and produced the same
-aggregate staking amount.
+A mainnet validation with multiple validator delegations was independently
+cross-checked against the Cosmos SDK REST response. The staking adapter now
+counts only delegations to validators currently in `BOND_STATUS_BONDED`.
 
 The project remains read-only. It does not yet prove wallet ownership, interact
 with Telegram, submit transactions, or execute the draft regime on-chain.
@@ -71,7 +71,7 @@ Set `AXONE_REST_URL` in `.env`, then query an address:
 npm run stake -- axone1...
 ```
 
-The command returns the total active delegation in `uaxone`, the number of
+The command returns the total stake delegated to BONDED validators in `uaxone`, the number of
 validator delegations, the configured threshold, and the resulting status.
 
 Run the checks:

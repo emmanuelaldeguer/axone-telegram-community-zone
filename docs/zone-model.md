@@ -126,7 +126,8 @@ Not implemented yet.
 
 `active_delegation_amount`
 
-Represents the total active delegation amount of the Axone qualification subject.
+Represents the total `uaxone` delegated by the Axone qualification subject to
+validators currently in `BOND_STATUS_BONDED`.
 
 Delegations across all validators are aggregated.
 
