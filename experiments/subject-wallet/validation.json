@@ -1,0 +1,71 @@
+{
+  "status": "LOCAL_TESTS_PASS_NATIVE_VALIDATION_PENDING",
+  "date": "2026-10-29",
+  "maintainer_reference": "https://github.com/axone-protocol/contracts/issues/873#issuecomment-6441578159",
+  "base_commit": "b308523b5822db930855312fb1d7308a6d1e814f",
+  "branch": "codex/subject-wallet-poc",
+  "baseline": {
+    "axoned": "5570d4c6652eed7598bbe68e0189cca68a79a3c4",
+    "contracts": "3fa1f29e76b263bc40c30618ddbbc135ccd9bbae",
+    "policy": "develop against functional main interfaces; full dendrite-2 flow awaits v16",
+    "upstream_patch_required": false
+  },
+  "implemented": {
+    "subject_distinct_from_submitter": true,
+    "secret_commitment_in_case": false,
+    "author_index_required": false,
+    "latest_relevant_by_subject_including_refusal": true,
+    "complete_history_or_error": true,
+    "historical_height_receipt_required": true,
+    "source_code_and_constitution_pinned": true,
+    "full_common_window_coverage": true,
+    "immutable_manifest": true,
+    "real_zk_proof": false,
+    "telegram_effects": false
+  },
+  "policy_gate": {
+    "profile": "telegram_publish_strict_v1",
+    "candidate_only": true,
+    "minimum_uaxone": "1000000000",
+    "qualification_seconds": 259200,
+    "grace_active_in_candidate": false,
+    "historical_grace_policy_modified": false,
+    "snapshot_age_and_lease": "mandatory explicit configuration; 60/30 seconds native fixture only",
+    "renewal_funding": "manual requests paid by submitter; no scheduler or funding pool"
+  },
+  "local_checks": {
+    "npm_run_ci": "PASS",
+    "typescript_tests": 58,
+    "new_snapshot_and_transport_tests": 41,
+    "subject_core_cases": 22,
+    "historical_differential_cases": 1440,
+    "python_compile": "PASS",
+    "node_script_syntax": "PASS",
+    "workflow_structure": "PASS",
+    "whitespace": "PASS"
+  },
+  "native_checks": {
+    "status": "NOT_RUN_LOCALLY; workflow configured",
+    "gov_source": "stock, no author-index patch",
+    "planned_assessments": 8,
+    "planned_committed_failure_cases": 7,
+    "historical_rest_snapshot": "planned live gateway test, not claimed passing"
+  },
+  "proof": {
+    "mechanism": "not selected",
+    "view_id": "manifest fingerprint, not a Merkle root or ZK proof",
+    "source_authentication": "trusted full node and checked context/receipts; not cryptographic state proofs"
+  },
+  "public_deployment": false,
+  "sha256": {
+    "experiments/subject-wallet/constitution.pl": "9c014e5b9b750e65723e94655f861caea6da10e7f0bcc6d93dd0fd41c01ae71a",
+    "src/zone/wallet-snapshot.ts": "18eee37b9daeb33cb60b7c81c9b13e462a28077ecce583af517b2e0a3e151b81",
+    "src/zone/gov-rest-source.ts": "35d59e3d7fb0e859960efd355ae52e7932b09592b09e22e6f5fa4446b2f7475f",
+    "test/wallet-snapshot.test.ts": "090ab82f8a0e22d956b23afd0217fa7c4dd3cd40c102a8b539145531f1256b04",
+    "tools/native_subject_scenarios.py": "ddb4fe11d3555c5bae73f12eed5de6cefa36cdb2b0187070c8a3d018269232e1",
+    "tools/check-subject-snapshot.mjs": "eb1bb4da0bbcf14f382f56dd669604ee96809b536249e5a16ae7b43dc4e68601",
+    "tools/native-compact-smoke.py": "da3a2007dc5fd856d28b5005d5f6a0569bc3c5369a30a3680fc7b005e93cfe5d",
+    "tools/prolog-smoke/subject_wallet_test.go": "370f7fa7238887ac48391e215b520c859ea2c03fbfec034c357e898e61fc345a",
+    ".github/workflows/native-wallet.yml": "2e6e07447ee297aca4f0ac9950d692c60cd90ef8baa41f7f98b6c6d81643827d"
+  }
+}

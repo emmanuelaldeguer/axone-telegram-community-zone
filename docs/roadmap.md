@@ -1,5 +1,22 @@
 # Roadmap
 
+## Subject-wallet PoC: current work
+
+See [ADR 0004](decisions/0004-subject-wallet-poc.md) and
+[maintainer clarification](https://github.com/axone-protocol/contracts/issues/873#issuecomment-6441578159).
+
+- [x] Separate subject wallet from submitter; remove commitments and arbitrary revocation acts.
+- [x] Add a strict native assessment candidate, without a gov patch or author-index dependency.
+- [x] Add complete fixed-height Decisions selection, latest per subject including refusals.
+- [x] Add explicit freshness/common-lease checks and strict historical REST receipts.
+- [x] Test subject/payer separation, stale/expired/refused state and incomplete history.
+- [ ] Complete native stock-main/REST workflow validation on this new profile.
+- [ ] Agree strict-versus-grace economics, source age, lease duration and renewal funding.
+- [ ] Select/validate anonymous wallet-control proof, then integrate the MiniApp/bot.
+- [ ] Full Abstract/dendrite-2 v16 demonstration and permission reconciliation.
+
+The older commitment/index prototype and its tests below are historical.
+
 ## Current native checkpoint and recovery
 
 See [ADR 0003](decisions/0003-axone-gov-native-poc.md). Older milestones below

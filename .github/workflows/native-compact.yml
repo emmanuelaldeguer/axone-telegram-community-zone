@@ -1,20 +1,8 @@
 name: Native compact lifecycle
 
+# Historical commitment/index experiment; not the current PoC direction.
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'experiments/compact-lifecycle/**'
-      - 'tools/native-compact-smoke.py'
-      - 'tools/build-compact-constitution.py'
-      - 'tools/prolog-smoke/**'
-      - 'policies/telegram-community-zone.pl'
-      - '.github/workflows/native-compact.yml'
-  pull_request:
-    paths:
-      - 'experiments/compact-lifecycle/**'
-      - 'tools/native-compact-smoke.py'
-      - '.github/workflows/native-compact.yml'
 
 permissions:
   contents: read

@@ -1,5 +1,8 @@
 # ADR 0003: native axone-gov entitlement and private presentation
 
+The prototype-specific commitment/author-index direction is superseded by
+[ADR 0004](0004-subject-wallet-poc.md). Retained as historical recovery evidence.
+
 Target agreed in this project conversation; reconstructed after workspace
 maintenance on 2026-10-28. This is not evidence of a deployed public PoC.
 

@@ -1,11 +1,15 @@
 # Axone Telegram Community Zone
 
-Current target: [native axone-gov and private presentation](docs/decisions/0003-axone-gov-native-poc.md).
-The [compact lifecycle checkpoint](experiments/compact-lifecycle/README.md)
-reconstructs unpublished work after workspace maintenance. Its Prolog and
-TypeScript checks are rerun; lost native reports are not recreated. A dedicated
-workflow regenerates native evidence once the checkpoint is published. Real
-anonymous enrollment and Telegram enforcement remain unfinished.
+Current target: [subject-wallet assessments and separate anonymous control proof](docs/decisions/0004-subject-wallet-poc.md),
+following the maintainer's clarification on issue #873. The
+[aligned PoC candidate](experiments/subject-wallet/README.md) uses existing gov
+queries, no commitment in the case, and latest relevant decisions per subject
+wallet. Its strict economic profile has no grace; the historical grace policy
+remains unchanged and is a separate policy gate before deployment. Anonymous
+wallet-control proof and Telegram enforcement remain unfinished.
+
+The [compact commitment/index checkpoint](experiments/compact-lifecycle/README.md)
+is a historical experiment, superseded as the current PoC direction.
 
 Experimental implementation of an Axone-governed Telegram community. The
 project explores how an explicit regime can qualify wallet evidence and grant

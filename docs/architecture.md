@@ -2,7 +2,19 @@
 
 ## Current native direction
 
-[ADR 0003](decisions/0003-axone-gov-native-poc.md) supersedes the older
+[ADR 0004](decisions/0004-subject-wallet-poc.md) is the current architecture:
+anyone may submit and fund an assessment of a subject wallet; the constitution
+queries that wallet's native stake. A fixed-height snapshot uses the latest
+relevant assessment per subject, including refusals, through existing Decisions
+pagination. No on-chain identity commitment or author index is required.
+Anonymous control of a wallet in that set remains an unimplemented proof step.
+
+The [new strict profile](../experiments/subject-wallet/README.md) is explicitly
+separate from the unchanged historical grace policy. Snapshot age, leases,
+funding and grace must be agreed before production integration. The following
+ADR 0003 paragraph records the superseded recovery prototype.
+
+[ADR 0003](decisions/0003-axone-gov-native-poc.md) previously superseded the older
 wallet/Telegram verification-service sketch below. Constitution evaluation and
 recorded gov decisions are the native authority. Anonymous presentation to the
 bot must not reveal a wallet, commitment or individual record identifier.

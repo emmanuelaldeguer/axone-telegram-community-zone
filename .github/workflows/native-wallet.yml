@@ -1,0 +1,91 @@
+name: Native subject-wallet PoC
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'experiments/subject-wallet/**'
+      - 'src/zone/wallet-snapshot.ts'
+      - 'src/zone/gov-rest-source.ts'
+      - 'test/wallet-snapshot.test.ts'
+      - 'tools/native_subject_scenarios.py'
+      - 'tools/check-subject-snapshot.mjs'
+      - 'tools/native-compact-smoke.py'
+      - 'tools/prolog-smoke/subject_wallet_test.go'
+      - '.github/workflows/native-wallet.yml'
+  pull_request:
+    paths:
+      - 'experiments/subject-wallet/**'
+      - 'src/zone/wallet-snapshot.ts'
+      - 'src/zone/gov-rest-source.ts'
+      - 'tools/native_subject_scenarios.py'
+      - '.github/workflows/native-wallet.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CARGO_BUILD_JOBS: 2
+      CARGO_INCREMENTAL: 0
+      CARGO_PROFILE_DEV_DEBUG: 0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.0'
+          cache-dependency-path: tools/prolog-smoke/go.sum
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.85.0'
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+      - name: Test selector, REST transport and Prolog rules
+        run: |
+          npm ci
+          npm run ci
+      - name: Build pinned functional main baselines, without gov patches
+        env:
+          OPENSSL_LIB_DIR: /usr/lib/x86_64-linux-gnu
+          OPENSSL_INCLUDE_DIR: /usr/include
+        run: |
+          git clone https://github.com/axone-protocol/axoned.git .work-cache/axoned
+          git -C .work-cache/axoned checkout 5570d4c6652eed7598bbe68e0189cca68a79a3c4
+          git clone https://github.com/axone-protocol/contracts.git .work-cache/contracts
+          git -C .work-cache/contracts checkout 3fa1f29e76b263bc40c30618ddbbc135ccd9bbae
+          cd .work-cache/axoned
+          go build -p 2 -tags netgo -o ../axoned-native ./cmd/axoned
+          cd ../contracts
+          cargo test --locked -p axone-gov --lib --test integration
+          cargo clippy --locked -p axone-gov --lib -- -D warnings
+          RUSTFLAGS='-C link-arg=--import-undefined' cargo build --locked --release --lib --target wasm32-unknown-unknown -p axone-gov
+          git diff --exit-code
+      - name: Optimize upstream gov Wasm
+        run: |
+          curl -fLsS https://github.com/WebAssembly/binaryen/releases/download/version_133/binaryen-version_133-x86_64-linux.tar.gz -o "$RUNNER_TEMP/binaryen.tar.gz"
+          python - "$RUNNER_TEMP/binaryen.tar.gz" <<'PY'
+          import hashlib, pathlib, sys
+          assert hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest() == '2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489'
+          PY
+          tar -xzf "$RUNNER_TEMP/binaryen.tar.gz" -C "$RUNNER_TEMP"
+          "$RUNNER_TEMP/binaryen-version_133/bin/wasm-opt" -Oz -aimfs 0 -fimfs 0 -ocimfs 0 -pii 0 .work-cache/contracts/target/wasm32-unknown-unknown/release/axone_gov.wasm -o .work-cache/axone-gov-upstream.wasm
+      - name: Native third-party assessments and fixed-height REST snapshot
+        run: |
+          mkdir -p native-reports
+          python tools/native-compact-smoke.py --profile subject --axoned .work-cache/axoned-native --gov-wasm .work-cache/axone-gov-upstream.wasm --report native-reports/subject-wallet.json
+      - name: Preserve raw evidence, including partial failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-subject-wallet-evidence
+          path: native-reports/
+          if-no-files-found: ignore

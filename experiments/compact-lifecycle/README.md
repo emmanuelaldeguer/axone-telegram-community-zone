@@ -1,5 +1,13 @@
 # Compact native lifecycle: reconstructed checkpoint
 
+**Historical experiment, not the current PoC target.**
+[ADR 0004](../../docs/decisions/0004-subject-wallet-poc.md) removes the commitment
+and author-index requirements. The [subject-wallet candidate](../subject-wallet/README.md)
+uses unmodified gov and existing paginated Decisions instead. This experiment's
+native workflow is manual-only; its results do not validate the new candidate.
+Recovery hashes refer to commit `b308523`, not later changes to the shared
+harness. The current subject profile has its own validation record and workflow.
+
 Date: 2026-10-28. Base Git commit:
 `f71574913dbc9e7cef3d3bde3d7b186139ef12b0`.
 

@@ -7,6 +7,7 @@ import argparse
 import base64
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 import subprocess
@@ -21,12 +22,15 @@ def main():
     ap.add_argument('--gov-wasm', required=True)
     ap.add_argument('--report', required=True)
     ap.add_argument('--readable', action='store_true')
+    ap.add_argument('--profile', choices=['legacy', 'subject'], default='legacy')
     args = ap.parse_args()
     cli, wasm, output = Path(args.axoned).resolve(), Path(args.gov_wasm).resolve(), Path(args.report)
     root = Path(__file__).resolve().parent.parent
     filename = 'constitution.pl' if args.readable else 'constitution.compact.pl'
-    template = (root / 'experiments/compact-lifecycle' / filename).read_text()
-    report = {'result': 'INCOMPLETE', 'date': datetime.now(timezone.utc).date().isoformat(), 'source': filename,
+    template = (root / ('experiments/subject-wallet/constitution.pl' if args.profile == 'subject'
+                        else 'experiments/compact-lifecycle/' + filename)).read_text()
+    report = {'result': 'INCOMPLETE', 'date': datetime.now(timezone.utc).date().isoformat(),
+              'profile': args.profile, 'source': 'subject-wallet/constitution.pl' if args.profile == 'subject' else filename,
               'node_sha256': hashlib.sha256(cli.read_bytes()).hexdigest(),
               'gov_wasm_sha256': hashlib.sha256(wasm.read_bytes()).hexdigest(),
               'direct_instantiation_fixture': True, 'production_abstract_installation_tested': False,
@@ -69,10 +73,22 @@ def main():
         run('genesis', 'validate-genesis')
         cfg = Path(home) / 'config/config.toml'
         cfg.write_text(cfg.read_text().replace('timeout_commit = "5s"', 'timeout_commit = "1s"'))
+        if args.profile == 'subject':
+            client_cfg = Path(home) / 'config/client.toml'
+            current = client_cfg.read_text() if client_cfg.exists() else ''
+            node_setting = 'node = "tcp://127.0.0.1:28657"'
+            if re.search(r'^node\s*=', current, flags=re.M):
+                current = re.sub(r'^node\s*=.*$', node_setting, current, flags=re.M)
+            else:
+                current += '\n' + node_setting + '\n'
+            client_cfg.write_text(current)
         with (Path(home) / 'node.log').open('w+') as log:
-            node = subprocess.Popen([str(cli), 'start', '--home', home,
+            node_args = [str(cli), 'start', '--home', home,
                 '--rpc.laddr', 'tcp://127.0.0.1:28657', '--p2p.laddr', 'tcp://127.0.0.1:28656',
-                '--grpc.address', '127.0.0.1:29090', '--minimum-gas-prices', '0.025uaxone'], stdout=log, stderr=log)
+                '--grpc.address', '127.0.0.1:29090', '--minimum-gas-prices', '0.025uaxone']
+            if args.profile == 'subject':
+                node_args += ['--api.enable', 'true', '--api.address', 'tcp://127.0.0.1:29317']
+            node = subprocess.Popen(node_args, stdout=log, stderr=log)
             try:
                 for _ in range(100):
                     try:
@@ -129,6 +145,12 @@ def main():
                 replacement = base64.b64encode(program.encode()).decode()
                 tx('wasm', 'execute', gov, json.dumps({'module': {'revise_constitution': {'constitution': replacement, 'case': None}}}))
                 assert query({'constitution_status': {}})['constitution_revision'] == 1
+
+                if args.profile == 'subject':
+                    from native_subject_scenarios import exercise_subject_wallet
+                    exercise_subject_wallet(tx, query, run, rpc, gov, program,
+                                            addresses, report, save, root, output)
+                    return
 
                 def records():
                     all_rows = query({'decisions': {'start_after': None, 'limit': 50}})['decisions']
