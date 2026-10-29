@@ -1,5 +1,19 @@
 # Roadmap
 
+## Current native checkpoint and recovery
+
+See [ADR 0003](decisions/0003-axone-gov-native-poc.md). Older milestones below
+do not establish complete native anonymous enrollment.
+
+- [x] Reconstruct compact constitution, author-index patch and native harness.
+- [x] Rerun 720 economic/lifecycle comparisons per source form and existing CI.
+- [x] Save the reconstructed checkpoint on `codex/restore-native-poc-2026-10-28`
+      using the owner connection; publication dated 2026-10-29.
+- [ ] Regenerate native/Rust evidence with the pinned-source workflow. Previous
+      raw native reports were removed by maintenance and are not fabricated.
+- [ ] Real commitments, secret possession, common membership roots and ZK presentation.
+- [ ] Approved v16/Abstract deployment, migration/recovery and Telegram effects.
+
 ## Milestone 1 — Active staking qualification
 
 - [x] load REST endpoint and threshold from configuration;

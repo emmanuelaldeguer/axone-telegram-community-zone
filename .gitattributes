@@ -1,0 +1,2 @@
+# Unified patch context intentionally represents empty lines with one space.
+experiments/compact-lifecycle/*.patch -whitespace

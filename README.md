@@ -1,5 +1,12 @@
 # Axone Telegram Community Zone
 
+Current target: [native axone-gov and private presentation](docs/decisions/0003-axone-gov-native-poc.md).
+The [compact lifecycle checkpoint](experiments/compact-lifecycle/README.md)
+reconstructs unpublished work after workspace maintenance. Its Prolog and
+TypeScript checks are rerun; lost native reports are not recreated. A dedicated
+workflow regenerates native evidence once the checkpoint is published. Real
+anonymous enrollment and Telegram enforcement remain unfinished.
+
 Experimental implementation of an Axone-governed Telegram community. The
 project explores how an explicit regime can qualify wallet evidence and grant
 or remove the right to publish in a Telegram group.

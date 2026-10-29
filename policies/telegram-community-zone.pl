@@ -125,7 +125,7 @@ evaluate(
 
 evaluate(
     evidence(true, true, available(ActiveStake)),
-    state(eligible, _, _),
+    state(eligible, _, PreviousExpiry),
     regime(MinimumStake, GracePeriod, _),
     CurrentTime,
     result(
@@ -136,7 +136,19 @@ evaluate(
     )
 ) :-
     ActiveStake < MinimumStake,
+    CurrentTime < PreviousExpiry,
     GraceExpiresAt is CurrentTime + GracePeriod.
+
+% An expired grant cannot acquire a new grace period from negative evidence.
+evaluate(
+    evidence(true, true, available(ActiveStake)),
+    state(eligible, _, PreviousExpiry),
+    regime(MinimumStake, _, _),
+    CurrentTime,
+    result(read_only, revoke_contributor_access, none, none)
+) :-
+    ActiveStake < MinimumStake,
+    CurrentTime >= PreviousExpiry.
 
 
 % ---------------------------------------------------------------------------

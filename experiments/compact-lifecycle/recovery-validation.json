@@ -1,0 +1,59 @@
+{
+  "status": "PARTIALLY_REVALIDATED_RECOVERY",
+  "date": "2026-10-28",
+  "base_commit": "f71574913dbc9e7cef3d3bde3d7b186139ef12b0",
+  "recovery": {
+    "method": "source reconstruction from visible conversation; no recovered raw native reports",
+    "compact_template_matches_prior_sha256": true,
+    "historical_reports_fabricated": false,
+    "older_uncommitted_experiments_not_in_git_base": "not recovered"
+  },
+  "fresh_checks": {
+    "npm_run_ci": "PASS",
+    "typescript_tests": 17,
+    "differential_cases_per_source": 720,
+    "differential_total": 1440,
+    "python_compile": "PASS",
+    "rustfmt_changed_upstream_files": "PASS",
+    "author_index_patch_clean_apply": "PASS",
+    "workflow_structure": "PASS"
+  },
+  "pending_checks": {
+    "native_compact_and_readable": "NOT_RERUN",
+    "rust_tests_and_clippy": "NOT_RERUN",
+    "wasm_build": "NOT_RERUN",
+    "github_actions_execution": "NOT_RUN"
+  },
+  "github": {
+    "target_repository": "emmanuelaldeguer/axone-telegram-community-zone",
+    "proposed_branch": "codex/restore-native-poc-2026-10-28",
+    "connected_username": "emmanuelaldeguer",
+    "observed_push_permission": true,
+    "publication_status": "CHECKPOINT_ON_DEDICATED_BRANCH",
+    "previous_attempt": {
+      "date": "2026-10-28",
+      "connected_username": "motylemmanuel-prog",
+      "observed_push_permission": false,
+      "error": "HTTP 403: Resource not accessible by integration"
+    },
+    "publication_date": "2026-10-29"
+  },
+  "profile": {
+    "symbolic_commitments_only": true,
+    "reserved_controller": true,
+    "real_enrollment": false,
+    "zk_presentation": false,
+    "telegram_effects": false,
+    "public_deployment": false
+  },
+  "sha256": {
+    "experiments/compact-lifecycle/constitution.pl": "30b021890dcc5e4a85ee0c90cde6ba8f5225efa835fd33e6d02252710a9ee5b2",
+    "experiments/compact-lifecycle/constitution.compact.pl": "de346d7dd2b97574b292690e352901ae3aae97ec53444e402a5bd5cb945ceb0c",
+    "experiments/compact-lifecycle/author-index.patch": "e5b3f0b743ed28cabbe780c3b401368a4563e097bef8c94051cd527dce4afbbc",
+    "tools/native-compact-smoke.py": "44d8f504a5824b6f69e3f2e1afd4712c1a7d788644a641e50affda73cbdf0c43",
+    "tools/build-compact-constitution.py": "2403af8bea79b04893159781216c392df47264e29e7a2fceb64bb15959b1a4e3",
+    "tools/prolog-smoke/compact_test.go": "4927d4a367bf513a951d77bf60662f2e38081365c289039c119ec79d60944af2",
+    "policies/telegram-community-zone.pl": "e435e5bf94828dfecb0996532b40a9bc9263afff73d9611b22549ca7090dcfb4",
+    ".github/workflows/native-compact.yml": "c8c36c9d2bd252b2e906fe9d14866aa392d68d5773bbfc06201a85594279ff51"
+  }
+}

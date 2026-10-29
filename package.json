@@ -13,6 +13,7 @@
   "build": "npm run clean && tsc -p tsconfig.json",
   "test": "node --test dist/test/*.test.js",
   "test:prolog": "cd tools/prolog-smoke && go test -v",
+  "test:compact": "cd tools/prolog-smoke && go test -v -run '^TestCompact'",
   "ci": "npm run build && npm test && npm run test:prolog",
   "stake": "npm run build --silent && node --env-file=.env dist/src/cli.js",
   "telegram:once": "npm run build --silent && node --env-file=.env dist/src/telegram/once.js"

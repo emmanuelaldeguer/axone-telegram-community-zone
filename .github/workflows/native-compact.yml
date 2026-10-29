@@ -1,0 +1,88 @@
+name: Native compact lifecycle
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'experiments/compact-lifecycle/**'
+      - 'tools/native-compact-smoke.py'
+      - 'tools/build-compact-constitution.py'
+      - 'tools/prolog-smoke/**'
+      - 'policies/telegram-community-zone.pl'
+      - '.github/workflows/native-compact.yml'
+  pull_request:
+    paths:
+      - 'experiments/compact-lifecycle/**'
+      - 'tools/native-compact-smoke.py'
+      - '.github/workflows/native-compact.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CARGO_BUILD_JOBS: 2
+      CARGO_INCREMENTAL: 0
+      CARGO_PROFILE_DEV_DEBUG: 0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.0'
+          cache-dependency-path: tools/prolog-smoke/go.sum
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.85.0'
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+      - name: Reproduce the checked compact source
+        run: |
+          python tools/build-compact-constitution.py --source experiments/compact-lifecycle/constitution.pl --output "$RUNNER_TEMP/compact.pl"
+          cmp "$RUNNER_TEMP/compact.pl" experiments/compact-lifecycle/constitution.compact.pl
+          cd tools/prolog-smoke
+          go test -v
+      - name: Build pinned unmodified node
+        run: |
+          git clone https://github.com/axone-protocol/axoned.git .work-cache/axoned
+          git -C .work-cache/axoned checkout 5570d4c6652eed7598bbe68e0189cca68a79a3c4
+          cd .work-cache/axoned
+          go build -p 2 -tags netgo -o ../axoned-native ./cmd/axoned
+      - name: Apply and test the generic gov index
+        env:
+          OPENSSL_LIB_DIR: /usr/lib/x86_64-linux-gnu
+          OPENSSL_INCLUDE_DIR: /usr/include
+        run: |
+          git clone https://github.com/axone-protocol/contracts.git .work-cache/contracts
+          git -C .work-cache/contracts checkout 017fed78601ac6e4a3a1fa119a5829c18e063ba8
+          git -C .work-cache/contracts apply ../../experiments/compact-lifecycle/author-index.patch
+          cd .work-cache/contracts
+          rustfmt --check --edition 2021 contracts/axone-gov/src/state.rs contracts/axone-gov/src/msg.rs contracts/axone-gov/src/handlers/query.rs
+          cargo test --locked -p axone-gov --lib --test integration
+          cargo clippy --locked -p axone-gov --lib -- -D warnings
+          RUSTFLAGS='-C link-arg=--import-undefined' cargo build --locked --release --lib --target wasm32-unknown-unknown -p axone-gov
+      - name: Optimize Wasm with pinned Binaryen
+        run: |
+          curl -fLsS https://github.com/WebAssembly/binaryen/releases/download/version_133/binaryen-version_133-x86_64-linux.tar.gz -o "$RUNNER_TEMP/binaryen.tar.gz"
+          python - "$RUNNER_TEMP/binaryen.tar.gz" <<'PY'
+          import hashlib, pathlib, sys
+          assert hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest() == '2dc9c7813f5375db93d96ead4b78222fcc3e2677bbb832297af4797782a37489'
+          PY
+          tar -xzf "$RUNNER_TEMP/binaryen.tar.gz" -C "$RUNNER_TEMP"
+          "$RUNNER_TEMP/binaryen-version_133/bin/wasm-opt" -Oz -aimfs 0 -fimfs 0 -ocimfs 0 -pii 0 .work-cache/contracts/target/wasm32-unknown-unknown/release/axone_gov.wasm -o .work-cache/axone-gov-indexed.wasm
+      - name: Run compact and readable native scenarios at default limits
+        run: |
+          mkdir -p native-reports
+          python tools/native-compact-smoke.py --axoned .work-cache/axoned-native --gov-wasm .work-cache/axone-gov-indexed.wasm --report native-reports/compact.json
+          python tools/native-compact-smoke.py --axoned .work-cache/axoned-native --gov-wasm .work-cache/axone-gov-indexed.wasm --readable --report native-reports/readable.json
+      - name: Preserve newly generated raw evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-compact-evidence
+          path: native-reports/
+          if-no-files-found: ignore

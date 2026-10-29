@@ -1,5 +1,17 @@
 # Architecture
 
+## Current native direction
+
+[ADR 0003](decisions/0003-axone-gov-native-poc.md) supersedes the older
+wallet/Telegram verification-service sketch below. Constitution evaluation and
+recorded gov decisions are the native authority. Anonymous presentation to the
+bot must not reveal a wallet, commitment or individual record identifier.
+
+The [reconstructed compact prototype](../experiments/compact-lifecycle/README.md)
+reserves a separate controller and uses symbolic commitments. Prior native
+reports were lost; fresh native revalidation is provided as CI, not claimed as
+already completed by recovery. The remaining sections record earlier milestones.
+
 ## Purpose
 
 This project progressively turns a staking-gated Telegram discussion group into an Axone-governed community Zone.

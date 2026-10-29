@@ -1,0 +1,234 @@
+diff --git a/contracts/axone-gov/src/handlers/query.rs b/contracts/axone-gov/src/handlers/query.rs
+index b83fb9a..d439341 100644
+--- a/contracts/axone-gov/src/handlers/query.rs
++++ b/contracts/axone-gov/src/handlers/query.rs
+@@ -8,8 +8,10 @@ use crate::{
+     state::load_constitution,
+ };
+ 
+-use crate::msg::{DecisionResponse, DecisionsResponse};
+-use crate::state::{load_constitution_status, load_decision, load_decisions};
++use crate::msg::{DecisionResponse, DecisionsByAuthorResponse, DecisionsResponse};
++use crate::state::{
++    load_constitution_status, load_decision, load_decisions, load_decisions_by_author,
++};
+ use cosmwasm_std::{to_json_binary, Binary, Deps, Env, QuerierWrapper};
+ 
+ pub fn query_handler(
+@@ -29,6 +31,26 @@ pub fn query_handler(
+         AxoneGovQueryMsg::Decision { decision_id } => {
+             to_json_binary(&query_decision(deps, decision_id)?)
+         }
++        AxoneGovQueryMsg::DecisionsByAuthor {
++            author,
++            start_after,
++            limit,
++            descending,
++        } => {
++            let author = deps.api.addr_validate(&author)?;
++            let (records, next_start_after) = load_decisions_by_author(
++                deps.storage,
++                &author,
++                start_after,
++                limit,
++                descending.unwrap_or(false),
++            )?;
++            let decisions = records.into_iter().map(DecisionResponse::from).collect();
++            to_json_binary(&DecisionsByAuthorResponse {
++                decisions,
++                next_start_after,
++            })
++        }
+         AxoneGovQueryMsg::Decisions { start_after, limit } => {
+             to_json_binary(&query_decisions(deps, start_after, limit)?)
+         }
+diff --git a/contracts/axone-gov/src/msg.rs b/contracts/axone-gov/src/msg.rs
+index 3323261..e35e3d4 100644
+--- a/contracts/axone-gov/src/msg.rs
++++ b/contracts/axone-gov/src/msg.rs
+@@ -207,6 +207,15 @@ pub enum AxoneGovQueryMsg {
+         decision_id: u64,
+     },
+ 
++    /// Return original records for one author. Legacy index migration required.
++    #[returns(DecisionsByAuthorResponse)]
++    DecisionsByAuthor {
++        author: String,
++        start_after: Option<u64>,
++        limit: Option<u32>,
++        descending: Option<bool>,
++    },
++
+     /// Return a paginated list of recorded decisions.
+     ///
+     /// Decisions are ordered by their unique identifier in ascending order.
+@@ -323,3 +332,9 @@ impl From<DecisionRecord> for DecisionResponse {
+ pub struct DecisionsResponse {
+     pub decisions: Vec<DecisionResponse>,
+ }
++
++#[cosmwasm_schema::cw_serde]
++pub struct DecisionsByAuthorResponse {
++    pub decisions: Vec<DecisionResponse>,
++    pub next_start_after: Option<u64>,
++}
+diff --git a/contracts/axone-gov/src/state.rs b/contracts/axone-gov/src/state.rs
+index 9a92205..788703e 100644
+--- a/contracts/axone-gov/src/state.rs
++++ b/contracts/axone-gov/src/state.rs
+@@ -26,6 +26,8 @@ const INITIAL_DECISION_ID_COUNTER: u64 = 0;
+ 
+ const DECISION_ID_COUNTER: Item<u64> = Item::new("decision_id_counter");
+ const DECISIONS: Map<u64, DecisionRecord> = Map::new("decisions");
++const DECISIONS_BY_AUTHOR: Map<(&Addr, u64), ()> = Map::new("decisions_by_author");
++const AUTHOR_INDEX_VERSION: Item<u8> = Item::new("author_index_version");
+ 
+ #[cw_serde]
+ #[derive(CopyGetters, Getters)]
+@@ -86,6 +88,9 @@ pub fn save_initial_constitution(
+     CONSTITUTION.save(storage, constitution.bytes())?;
+     CONSTITUTION_STATUS.save(storage, &status)?;
+ 
++    // Fresh instances only. New writes must never mark a legacy index complete.
++    AUTHOR_INDEX_VERSION.save(storage, &1)?;
++
+     Ok(status)
+ }
+ 
+@@ -145,6 +150,7 @@ pub fn record_decision(
+     };
+ 
+     DECISIONS.save(storage, record.id, &record)?;
++    DECISIONS_BY_AUTHOR.save(storage, (&record.author, record.id), &())?;
+ 
+     Ok(record)
+ }
+@@ -174,6 +180,54 @@ pub fn load_decisions(
+         .collect()
+ }
+ 
++pub fn load_decisions_by_author(
++    storage: &dyn Storage,
++    author: &Addr,
++    start_after: Option<u64>,
++    limit: Option<u32>,
++    descending: bool,
++) -> Result<(Vec<DecisionRecord>, Option<u64>), AxoneGovError> {
++    if AUTHOR_INDEX_VERSION.may_load(storage)? != Some(1) {
++        return Err(
++            StdError::generic_err("author index unavailable: complete migration required").into(),
++        );
++    }
++    let limit = limit
++        .unwrap_or(DEFAULT_DECISIONS_LIMIT)
++        .min(MAX_DECISIONS_LIMIT) as usize;
++    if limit == 0 {
++        return Err(StdError::generic_err("author index limit must be positive").into());
++    }
++    let cursor = start_after.map(Bound::exclusive);
++    let (min, max, order) = if descending {
++        (None, cursor, Order::Descending)
++    } else {
++        (cursor, None, Order::Ascending)
++    };
++    let ids = DECISIONS_BY_AUTHOR
++        .prefix(author)
++        .keys(storage, min, max, order)
++        .take(limit + 1)
++        .collect::<Result<Vec<_>, _>>()?;
++    let next = if ids.len() > limit {
++        ids.get(limit - 1).copied()
++    } else {
++        None
++    };
++    let records = ids
++        .into_iter()
++        .take(limit)
++        .map(|id| {
++            let record = DECISIONS.load(storage, id)?;
++            if record.author != *author {
++                return Err(StdError::generic_err("author index record mismatch").into());
++            }
++            Ok(record)
++        })
++        .collect::<Result<Vec<_>, AxoneGovError>>()?;
++    Ok((records, next))
++}
++
+ fn next_decision_id(storage: &mut dyn Storage) -> Result<u64, AxoneGovError> {
+     let next = current_decision_id(storage)?
+         .checked_add(1)
+@@ -189,3 +243,73 @@ fn current_decision_id(storage: &dyn Storage) -> Result<u64, AxoneGovError> {
+         .unwrap_or(INITIAL_DECISION_ID_COUNTER);
+     Ok(current)
+ }
++
++#[cfg(test)]
++mod author_index_tests {
++    use super::*;
++    use cosmwasm_std::testing::MockStorage;
++
++    fn add(storage: &mut MockStorage, who: &str, verdict: &str) -> DecisionRecord {
++        record_decision(
++            storage,
++            Decision::new(
++                &ConstitutionStatus::new(0, [0; 32]),
++                "case".into(),
++                verdict.into(),
++                None,
++                Addr::unchecked(who),
++                1,
++                1,
++            ),
++        )
++        .unwrap()
++    }
++
++    #[test]
++    fn full_records_and_exclusive_pagination() {
++        let mut s = MockStorage::new();
++        AUTHOR_INDEX_VERSION.save(&mut s, &1).unwrap();
++        let a = Addr::unchecked("alice");
++        add(&mut s, "alice", "allowed");
++        add(&mut s, "bob", "other");
++        let denied = add(&mut s, "alice", "denied");
++        add(&mut s, "alice", "revoked");
++        let (page, next) = load_decisions_by_author(&s, &a, None, Some(2), true).unwrap();
++        assert_eq!(
++            page.iter().map(DecisionRecord::id).collect::<Vec<_>>(),
++            vec![4, 3]
++        );
++        assert_eq!(page[1], denied);
++        assert_eq!(next, Some(3));
++        let (page, next) = load_decisions_by_author(&s, &a, next, Some(2), true).unwrap();
++        assert_eq!(page[0].id(), 1);
++        assert_eq!(next, None);
++        let (page, next) = load_decisions_by_author(&s, &a, Some(1), Some(1), false).unwrap();
++        assert_eq!(page[0].id(), 3);
++        assert_eq!(next, Some(3));
++        assert!(load_decisions_by_author(&s, &a, None, Some(0), true).is_err());
++    }
++
++    #[test]
++    fn legacy_writes_do_not_claim_completeness() {
++        let mut s = MockStorage::new();
++        add(&mut s, "alice", "new");
++        let a = Addr::unchecked("alice");
++        assert!(load_decisions_by_author(&s, &a, None, None, true).is_err());
++        AUTHOR_INDEX_VERSION.save(&mut s, &2).unwrap();
++        assert!(load_decisions_by_author(&s, &a, None, None, true).is_err());
++    }
++
++    #[test]
++    fn broken_reference_is_an_error() {
++        let mut s = MockStorage::new();
++        AUTHOR_INDEX_VERSION.save(&mut s, &1).unwrap();
++        let a = Addr::unchecked("alice");
++        add(&mut s, "bob", "other");
++        DECISIONS_BY_AUTHOR.save(&mut s, (&a, 1), &()).unwrap();
++        assert!(load_decisions_by_author(&s, &a, None, None, true).is_err());
++        DECISIONS_BY_AUTHOR.remove(&mut s, (&a, 1));
++        DECISIONS_BY_AUTHOR.save(&mut s, (&a, 99), &()).unwrap();
++        assert!(load_decisions_by_author(&s, &a, None, None, true).is_err());
++    }
++}
