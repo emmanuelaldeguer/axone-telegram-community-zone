@@ -1,0 +1,9 @@
+{
+  "repository": "distributed-lab/noir-ripemd160",
+  "commit": "9bdaaa206316aee61c0fa24312d5413530ff7219",
+  "files": {
+    "LICENSE": "2d88335740b2eb376374a0f7adc662bcb6e8cc4dea79075e93abdd4572e0311f",
+    "Nargo.toml": "2f9514778184c9133d6d0c005b49d0cd6267cfefb66d16c2ba4253a1dfd1f671",
+    "src/lib.nr": "29bc3d4d0a7fabc76e49370f6709c037f6e982295b9a5b311eb10315b05ff39b"
+  }
+}

@@ -1,0 +1,4 @@
+circuit/target/
+circuit/Prover.toml
+circuit/Verifier.toml
+reports/*.proof*

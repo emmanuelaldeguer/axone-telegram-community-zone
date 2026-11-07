@@ -1,0 +1,62 @@
+name: Experimental anonymous wallet-control proof
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'experiments/wallet-control/**'
+      - 'src/zone/wallet-snapshot.ts'
+      - '.github/workflows/wallet-control-zk.yml'
+  pull_request:
+    paths:
+      - 'experiments/wallet-control/**'
+      - 'src/zone/wallet-snapshot.ts'
+      - '.github/workflows/wallet-control-zk.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  research-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            experiments/wallet-control/package-lock.json
+      - name: Build the native decision snapshot collector
+        run: |
+          npm ci
+          npm run build
+      - name: Install exact proving dependencies and compiler
+        run: |
+          npm ci --ignore-scripts --prefix experiments/wallet-control
+          python experiments/wallet-control/install-nargo.py
+          echo "$GITHUB_WORKSPACE/.work-cache/noir" >> "$GITHUB_PATH"
+      - name: Check versions and upstream source integrity
+        working-directory: experiments/wallet-control
+        run: node check-toolchain.mjs
+      - name: Compile circuit and run independent known-answer vectors
+        working-directory: experiments/wallet-control/circuit
+        run: |
+          nargo compile --deny-warnings
+          nargo test --deny-warnings
+      - name: Test presentation boundary and challenge lifecycle
+        working-directory: experiments/wallet-control
+        run: npm test
+      - name: Generate real randomized ZK proofs and exercise rejections
+        working-directory: experiments/wallet-control
+        run: |
+          rm -f reports/local-zk.json
+          npm run prove
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wallet-control-zk-research-evidence
+          path: experiments/wallet-control/reports/*.json
+          if-no-files-found: warn

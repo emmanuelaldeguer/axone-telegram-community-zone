@@ -1,0 +1,8 @@
+[package]
+name = "axone_wallet_control"
+type = "bin"
+authors = ["Axone community zone contributors"]
+compiler_version = ">=1.0.0"
+
+[dependencies]
+ripemd160 = { path = "vendor/ripemd160" }

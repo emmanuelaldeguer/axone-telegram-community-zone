@@ -1,7 +1,10 @@
-# Wallet-control anonymous proof: acceptance contract, not an implementation
+# Wallet-control anonymous proof: acceptance contract
 
 Source: [maintainer clarification](https://github.com/axone-protocol/contracts/issues/873#issuecomment-6441578159).
-No cryptographic mechanism or library is selected by this document.
+The isolated research implementation is now described in [ADR 0005](decisions/0005-anonymous-wallet-control-research.md).
+It selects ADR-036 signatures inside Noir/UltraHonk for an executable local
+prototype. Real-wallet, browser, source-distribution and Telegram validation
+remain pending; this document remains the integration acceptance boundary.
 
 The native assessment names a public subject wallet; it neither checks nor
 claims that its fee payer controls that wallet. Assessment/renewal must occur
@@ -21,11 +24,12 @@ For a common source/view and activation window, the eventual proof must bind:
 A normal wallet signature sent to the bot would expose its signing identity.
 An unrelated anonymous-identity membership proof would not establish control
 of a qualifying wallet. The bridge between signing/control, canonical address
-derivation and private membership must be selected, implemented and validated.
+derivation and private membership now has a local research implementation;
+independent review and real-wallet/application validation remain necessary.
 The design must work with existing wallets; requesting seed/private-key export
-is not the intended integration path. A mechanism using a wallet signature as
-a private witness is a requirement to investigate, not a claimed supported
-circuit, browser implementation or selected cryptosystem.
+is not the intended integration path. ADR 0005 uses a wallet signature as a
+private witness in a real circuit, with no claim of a ready browser application
+or production security.
 
 The proof client must obtain the same public membership data as everyone else,
 not fetch a personalized wallet path from the bot. The verifier must approve

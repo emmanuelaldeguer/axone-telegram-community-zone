@@ -1,0 +1,48 @@
+{
+  "status": "LOCAL_REAL_ZK_PROOF_PASS",
+  "date": "2026-11-07T14:18:21.270Z",
+  "scheme": "axone-adr036-hash160-merkle8-ultrahonk-zk-v1",
+  "circuitId": "15bc3e66f11aab22c53d9735b480090fd2b5a249a433e5639c817b59ba5aab60",
+  "artifactSha256": "9cfa3874554c18c65a5f18d37cd3f3cf93b54b06a0f22d1eaeebdbe925aa4039",
+  "verificationKeySha256": "284cdf00d47357ee65b500ddb73f2587bb4f912c6f89ff6c8c9d706addba304a",
+  "backend": "Barretenberg WASM, one thread, verifierTarget=evm (ZK enabled)",
+  "noir": "1.0.0-beta.18",
+  "bb": "3.0.0-nightly.20260102",
+  "data": "ephemeral test wallets and synthetic decision source passed through the actual snapshot collector; no live wallet/chain/Telegram session",
+  "publicInputFields": 64,
+  "proofBytes": 9792,
+  "members": 2,
+  "treeCapacity": 256,
+  "checks": [
+    "refused subject is absent despite an earlier positive decision",
+    "unentitled wallet is rejected",
+    "valid proof verifies against pinned verification key",
+    "modified challenge fails cryptographic verification",
+    "modified membership root fails cryptographic verification",
+    "modified proof fails cryptographic verification",
+    "extra identifying presentation field is rejected",
+    "another authenticated session cannot consume the proof",
+    "another audience cannot consume the proof",
+    "concurrent proof consumption succeeds exactly once",
+    "replay fails",
+    "invalid signature fails circuit execution",
+    "invalid private public key fails circuit execution",
+    "invalid address/public-key parity fails circuit execution",
+    "invalid Merkle sibling fails circuit execution",
+    "invalid Merkle position fails circuit execution",
+    "invalid signed challenge fails circuit execution",
+    "same-witness proofs are randomized and both verify"
+  ],
+  "timings": {
+    "setupMs": 8958,
+    "proveMs": 33628,
+    "totalMs": 77725
+  },
+  "pending": [
+    "independent cryptographic review",
+    "real Keplr/Leap ADR-036 signing",
+    "browser/mobile proving performance",
+    "durable challenge store",
+    "live chain and Telegram integration"
+  ]
+}

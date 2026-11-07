@@ -5,8 +5,11 @@ following the maintainer's clarification on issue #873. The
 [aligned PoC candidate](experiments/subject-wallet/README.md) uses existing gov
 queries, no commitment in the case, and latest relevant decisions per subject
 wallet. Its strict economic profile has no grace; the historical grace policy
-remains unchanged and is a separate policy gate before deployment. Anonymous
-wallet-control proof and Telegram enforcement remain unfinished.
+remains unchanged and is a separate policy gate before deployment.
+The [anonymous wallet-control research prototype](experiments/wallet-control/README.md)
+now generates real Noir/UltraHonk ZK proofs from private ADR-036 signatures,
+with local test wallets and synthetic decisions. Real-wallet/browser validation
+and Telegram integration remain unfinished. See [ADR 0005](docs/decisions/0005-anonymous-wallet-control-research.md).
 
 The [compact commitment/index checkpoint](experiments/compact-lifecycle/README.md)
 is a historical experiment, superseded as the current PoC direction.
@@ -33,7 +36,7 @@ The project turns a simple community rule into a governed act:
 | Decision | Grant, maintain, or remove publishing access |
 | Effect | Telegram member permissions are updated |
 
-## Current milestone
+## Historical staking CLI milestone
 
 Milestone 1 — active staking qualification — is complete.
 
@@ -55,12 +58,9 @@ A mainnet validation with multiple validator delegations was independently
 cross-checked against the Cosmos SDK REST response. The staking adapter now
 counts only delegations to validators currently in `BOND_STATUS_BONDED`.
 
-The project remains read-only. It does not yet prove wallet ownership, interact
-with Telegram, submit transactions, or execute the draft regime on-chain.
-
-The next milestone is **Milestone 2 — regime formalisation**: define the actors,
-acts, evidence, qualification rules, decisions and effects precisely, then
-validate how that regime should be expressed and executed through Axone.
+The staking CLI remains read-only. Subsequent local native assessments and the
+isolated proof experiment are documented above; the authoritative current
+checklist is in [the roadmap](docs/roadmap.md).
 
 ## Quick start
 

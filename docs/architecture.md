@@ -7,7 +7,9 @@ anyone may submit and fund an assessment of a subject wallet; the constitution
 queries that wallet's native stake. A fixed-height snapshot uses the latest
 relevant assessment per subject, including refusals, through existing Decisions
 pagination. No on-chain identity commitment or author index is required.
-Anonymous control of a wallet in that set remains an unimplemented proof step.
+Anonymous control now has an isolated [ADR-036/Noir research implementation](decisions/0005-anonymous-wallet-control-research.md)
+with real local ZK proofs. Real-wallet/browser validation and MiniApp/bot
+integration remain pending.
 
 The [new strict profile](../experiments/subject-wallet/README.md) is explicitly
 separate from the unchanged historical grace policy. Snapshot age, leases,

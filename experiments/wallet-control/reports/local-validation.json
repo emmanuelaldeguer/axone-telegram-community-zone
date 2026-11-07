@@ -1,0 +1,43 @@
+{
+  "scope": "Local reproducible research validation; synthetic decision source and ephemeral wallets, no live extension/browser/Telegram deployment",
+  "date": "2026-11-07T14:18:21.270Z",
+  "base_commit": "5e705343a2266c1431492326c9fabfdfd8abf343",
+  "checks": {
+    "existing_typescript_tests": 58,
+    "protocol_lifecycle_tests": 21,
+    "noir_known_answer_tests": 21,
+    "real_zk_scenarios": 18
+  },
+  "commands": [
+    "npm run build",
+    "npm test (repository root)",
+    "node check-toolchain.mjs",
+    "nargo compile --deny-warnings",
+    "nargo test --deny-warnings",
+    "npm test (experiment)",
+    "npm run prove"
+  ],
+  "native_baseline": {
+    "sha": "5e705343a2266c1431492326c9fabfdfd8abf343",
+    "result": "success (verified 2026-11-07)",
+    "url": "https://github.com/emmanuelaldeguer/axone-telegram-community-zone/actions/runs/40845734400"
+  },
+  "source_sha256": {
+    "experiments/wallet-control/check-toolchain.mjs": "114867f50ebe77bc04bd003667d6356f6c2e97d9d0e285306a2547cacbaef082",
+    "experiments/wallet-control/circuit/Nargo.toml": "dd5408e84797b6204ccd029c1a8953a30b17f45da5fac33bfec7be1991dfd571",
+    "experiments/wallet-control/circuit/src/main.nr": "668eb24aef9341d499d535e554bf577d5f12013304c9593aee740a0380284da1",
+    "experiments/wallet-control/circuit/src/sha256.nr": "7e5e9d3ca0ac4e8b710da711ff04be74481ad396c0bebc8069cdad2e458fbdb4",
+    "experiments/wallet-control/circuit/src/tests.nr": "bcb77738bd087c00de6d487f314bec8d6b7eec47e532f89cf13d588c60150464",
+    "experiments/wallet-control/circuit/vendor/ripemd160/Nargo.toml": "2f9514778184c9133d6d0c005b49d0cd6267cfefb66d16c2ba4253a1dfd1f671",
+    "experiments/wallet-control/circuit/vendor/ripemd160/UPSTREAM.json": "04718915a5ca09a68aac0ed6f5eb097257332a9a5934cb7c7122f618790d1449",
+    "experiments/wallet-control/circuit/vendor/ripemd160/src/lib.nr": "29bc3d4d0a7fabc76e49370f6709c037f6e982295b9a5b311eb10315b05ff39b",
+    "experiments/wallet-control/fixture.mjs": "434556cdc97ff2134ccb1f95f5f9a14bf53fcc6f6a2a1631adef678ca14a7bb7",
+    "experiments/wallet-control/install-nargo.py": "50d3f98b07f65a1bc3bc807975407d57859715820e3fcb06135abb7a27bddd20",
+    "experiments/wallet-control/package-lock.json": "d46e00c6ee111cee1ddbb4dac4a110061c374ae30598acdf2f30da5b96815246",
+    "experiments/wallet-control/package.json": "11c8625938ae1df6ec1d8be1ac3631d033a33073079f921da0cc08d294af2c68",
+    "experiments/wallet-control/protocol.mjs": "b76022a26e3605b670a75968c42029d2146188baa37022bc4851493c4dc8d912",
+    "experiments/wallet-control/prove.mjs": "6eee5a2518c4a2f741e5bc583fd9ecb53016afe51ac04b1c5a060203d1d39f76",
+    "experiments/wallet-control/test/protocol.test.mjs": "8d9e28e784347854e34c49c4207aaadcb6e8afd789c2e0d9e3a8dd04f7973172",
+    "experiments/wallet-control/zk.mjs": "4ff71177512e3c4404647f60bedcaccee364ce2b95b84235903c0502686d81a2"
+  }
+}

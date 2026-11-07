@@ -10,9 +10,12 @@ See [ADR 0004](decisions/0004-subject-wallet-poc.md) and
 - [x] Add complete fixed-height Decisions selection, latest per subject including refusals.
 - [x] Add explicit freshness/common-lease checks and strict historical REST receipts.
 - [x] Test subject/payer separation, stale/expired/refused state and incomplete history.
-- [ ] Complete native stock-main/REST workflow validation on this new profile.
+- [x] Complete native stock-main/REST workflow validation on this new profile ([successful run](https://github.com/emmanuelaldeguer/axone-telegram-community-zone/actions/runs/40845734400)).
 - [ ] Agree strict-versus-grace economics, source age, lease duration and renewal funding.
-- [ ] Select/validate anonymous wallet-control proof, then integrate the MiniApp/bot.
+- [x] Select an ADR-036/private-witness circuit for isolated research ([ADR 0005](decisions/0005-anonymous-wallet-control-research.md)).
+- [x] Generate and verify real randomized ZK proofs with ephemeral test wallets and the actual snapshot collector over synthetic records.
+- [ ] Review circuit/backend assumptions and validate real wallet signing and browser/mobile proving.
+- [ ] Integrate MiniApp/bot with authenticated sessions, shared durable challenge storage and permissions reconciliation.
 - [ ] Full Abstract/dendrite-2 v16 demonstration and permission reconciliation.
 
 The older commitment/index prototype and its tests below are historical.

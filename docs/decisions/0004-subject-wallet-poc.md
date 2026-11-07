@@ -23,9 +23,10 @@ height/context checks, not a cryptographic state-proof implementation.
 
 Later, a user answers a session-bound bot challenge with an anonymous proof of
 control of a wallet in that set. No identity commitment is recorded on chain.
-The proof mechanism is unselected; previous identity-membership experiments do
-not establish wallet control. Assessment and presentation remain temporally
-independent.
+The proof mechanism was initially unselected. [ADR 0005](0005-anonymous-wallet-control-research.md)
+now implements an isolated ADR-036/Noir research prototype; previous
+identity-membership experiments alone do not establish wallet control.
+Assessment and presentation remain temporally independent.
 
 The first stateless native candidate is explicitly named
 `telegram_publish_strict_v1`: 72-hour positive qualification, immediate refusal
